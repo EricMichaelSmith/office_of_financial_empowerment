@@ -6,9 +6,7 @@ Created on Sat May 31 15:33:02 2014
 """
 
 from __future__ import print_function
-import json
 import MySQLdb
-from pprint import pprint
 import sys
 
 configLocalPathS = r'C:\E\Dropbox\Computing\Personal\sudointellectual\county_data_analysis'
@@ -35,9 +33,20 @@ def main():
     # Get counselor form input
     counselor_table_name = counselor_form_input()
     
+    # Join databases
+    mysql_s = """
+        SELECT *
+        FROM clients FULL OUTER JOIN {counselor_table_name}
+        ON clients.ssn = {counselor_table_name}.ssn;
+        """
+    cur.execute(mysql_s.format(counselor_table_name=counselor_table_name))
     
-    
-    
+    # Output results
+    cur.execute('SELECT * FROM {table_name}'.format(table_name=counselor_table_name))
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
+        
     
     
 def counselor_form_input():
@@ -57,7 +66,7 @@ def counselor_form_input():
         ssn char(9) DEFAULT NULL,
         next_meeting_date date DEFAULT NULL,
         office_address char(75) DEFAULT NULL,
-        grow_personal_income booleam DEFAULT NULL,
+        grow_personal_income boolean DEFAULT NULL,
         bank_to_use char(50) DEFAULT NULL,
         bank_savings_per_month float(8, 2) DEFAULT NULL,
         deposit_goal float(8, 2) DEFAULT NULL,
